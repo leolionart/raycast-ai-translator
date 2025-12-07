@@ -9,6 +9,7 @@ import {
   showHUD,
   popToRoot,
   Icon,
+  LaunchProps,
 } from "@raycast/api";
 import {
   getTranslatorConfig,
@@ -17,7 +18,15 @@ import {
   TARGET_LANGUAGE_OPTIONS,
 } from "./translator";
 
-export default function Command() {
+interface TranslatePreviewArguments {
+  text?: string;
+}
+
+interface LaunchContext {
+  text?: string;
+}
+
+export default function Command(props: LaunchProps<{ arguments: TranslatePreviewArguments; launchContext: LaunchContext }>) {
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const [detectedLanguage, setDetectedLanguage] = useState("");
@@ -27,10 +36,18 @@ export default function Command() {
     LANGUAGES.AUTO,
   );
 
-  // Auto-load clipboard and translate on mount
+  // Auto-load clipboard or context and translate on mount
   useEffect(() => {
     async function loadAndTranslate() {
       try {
+        // Priority 1: Launch Context (from Translate Selection command)
+        if (props.launchContext?.text) {
+          setInputText(props.launchContext.text);
+          await handleTranslate(props.launchContext.text);
+          return;
+        }
+
+        // Priority 2: Clipboard
         const clipboardText = await Clipboard.readText();
         if (clipboardText && clipboardText.trim()) {
           setInputText(clipboardText.trim());
