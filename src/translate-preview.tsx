@@ -26,7 +26,12 @@ interface LaunchContext {
   text?: string;
 }
 
-export default function Command(props: LaunchProps<{ arguments: TranslatePreviewArguments; launchContext: LaunchContext }>) {
+export default function Command(
+  props: LaunchProps<{
+    arguments: TranslatePreviewArguments;
+    launchContext: LaunchContext;
+  }>,
+) {
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const [detectedLanguage, setDetectedLanguage] = useState("");

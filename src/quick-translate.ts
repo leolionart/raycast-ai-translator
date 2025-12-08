@@ -1,4 +1,4 @@
-import { Clipboard, showToast, Toast, showHUD, popToRoot } from "@raycast/api";
+import { Clipboard, showToast, Toast, popToRoot } from "@raycast/api";
 import { getTranslatorConfig, smartTranslate } from "./translator";
 
 export default async function Command() {
@@ -39,13 +39,12 @@ export default async function Command() {
     // Smart translate
     const result = await smartTranslate(clipboardText.trim(), config);
 
-    // Paste result to active app
-    await Clipboard.paste(result.translatedText);
-
-    // Show success HUD
-    await showHUD(`✓ ${result.detectedLanguage} → ${result.targetLanguage}`);
-
-    // Close Raycast
+    // Show result in toast
+    await showToast({
+      style: Toast.Style.Success,
+      title: "Translation Result",
+      message: result.translatedText,
+    });
     await popToRoot();
   } catch (error) {
     console.error("Quick translate error:", error);

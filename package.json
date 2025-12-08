@@ -26,9 +26,9 @@
         },
         {
             "name": "quick-translate",
-            "title": "Quick Translate",
-            "subtitle": "Clipboard → Paste",
-            "description": "Auto-translate clipboard and paste instantly.",
+      "title": "Quick Translate (Toast)",
+      "subtitle": "Clipboard → Toast",
+      "description": "Auto-translate clipboard and show result in toast.",
             "mode": "no-view"
         },
         {

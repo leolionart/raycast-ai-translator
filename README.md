@@ -1,140 +1,99 @@
-# AI Translator
+# AI Translator (Trình Dịch AI)
 
-A Raycast extension for intelligent text translation with automatic language detection.
+Một tiện ích mở rộng của Raycast dành cho việc dịch văn bản thông minh với khả năng tự động phát hiện ngôn ngữ.
 
-## Features
+## Cài Đặt
 
-- 🌐 **Automatic Language Detection**: AI-powered detection of input language
-- 🔄 **Smart Translation Routing**: Automatically translates between your preferred languages
-- ⚙️ **Custom API Support**: Works with OpenAI and compatible APIs
-- 📋 **Instant Paste**: Translate and paste directly into active application
-- ⌨️ **Multiple Commands**: Quick translate, preview mode, and form-based translation
+1.  Tải về file cài đặt có đuôi `.rayext` từ link được chia sẻ.
+2.  Nháy đúp (double-click) vào file vừa tải về.
+3.  Raycast sẽ tự động mở ra, bạn chỉ cần nhấn nút **Install** để hoàn tất.
 
-## Commands
+## Cấu Hình Ban Đầu
 
-| Command                       | Description                                          |
-| ----------------------------- | ---------------------------------------------------- |
-| **Quick Translate**     | Auto-translate clipboard and paste instantly (no UI) |
-| **Translate**           | Preview translation result, press Enter to paste     |
-| **Translate (Form)**    | Manual translate with language selection form        |
-| **Translate Selection** | Translate selected text and paste result             |
+Sau khi cài đặt, bạn cần cấu hình các thông tin cần thiết để extension hoạt động:
 
-## Installation
+1. Mở Raycast → `Cmd + ,` → Extensions → AI Translator.
+2. Cập nhật các mục sau:
+   - **API Key**: API key của bạn cho dịch vụ OpenAI (bắt buộc).
+   - **API URL**: URL cơ sở (mặc định: `https://api.openai.com/v1/chat/completions`).
+   - **AI Model**: Model AI sử dụng (mặc định: `gpt-3.5-turbo`).
+   - **Ngôn Ngữ Chính**: Ngôn ngữ chính của bạn (mặc định: `Vietnamese`).
+   - **Ngôn Ngữ Phụ**: Ngôn ngữ thứ hai của bạn (mặc định: `English`).
 
-### Option 1: Import Extension (Recommended)
+## Cách Hoạt Động
 
-Cài đặt extension một lần và sử dụng vĩnh viễn mà không cần chạy dev mode:
+Tiện ích mở rộng sử dụng AI để phát hiện ngôn ngữ nhập vào và định tuyến bản dịch một cách thông minh:
+
+- **Ngôn Ngữ Chính → Ngôn Ngữ Phụ**: Nếu bạn nhập tiếng Việt, nó sẽ dịch sang tiếng Anh.
+- **Ngôn Ngữ Phụ → Ngôn Ngữ Chính**: Nếu bạn nhập tiếng Anh, nó sẽ dịch sang tiếng Việt.
+- **Ngôn Ngữ Khác → Ngôn Ngữ Chính**: Bất kỳ ngôn ngữ nào khác sẽ được dịch sang ngôn ngữ chính của bạn.
+
+## Ví Dụ Sử Dụng
+
+**Lệnh Dịch Nhanh (Khuyên Dùng)**:
+
+1. Sao chép văn bản vào clipboard.
+2. Mở Raycast → "Dịch Nhanh".
+3. Bản dịch sẽ tự động được dán vào ứng dụng đang hoạt động.
+
+**Lệnh Dịch (Chế Độ Xem Trước)**:
+
+1. Sao chép văn bản vào clipboard.
+2. Mở Raycast → "Dịch".
+3. Xem trước bản dịch, nhấn `Enter` để dán.
+
+**Lệnh Dịch Vùng Chọn**:
+
+1. Chọn văn bản trong bất kỳ ứng dụng nào.
+2. Mở Raycast → "Dịch Vùng Chọn".
+3. Bản dịch sẽ thay thế văn bản đã chọn.
+
+## Tính Năng
+
+- 🌐 **Tự Động Phát Hiện Ngôn Ngữ**: Phát hiện ngôn ngữ nhập vào bằng trí tuệ nhân tạo.
+- 🔄 **Luồng Dịch Thông Minh**: Tự động dịch giữa các ngôn ngữ bạn ưa thích.
+- ⚙️ **Hỗ Trợ API Tùy Chỉnh**: Hoạt động với OpenAI và các API tương thích.
+- 📋 **Dán Tức Thì**: Dịch và dán trực tiếp vào ứng dụng đang hoạt động.
+- ⌨️ **Nhiều Lệnh**: Dịch nhanh, chế độ xem trước và dịch dựa trên biểu mẫu.
+
+---
+
+## Dành cho Nhà Phát triển (For Developers)
+
+### Cài đặt từ Mã nguồn
+
+Cài đặt extension một lần và sử dụng vĩnh viễn mà không cần chạy chế độ dev:
 
 ```bash
-# 1. Clone hoặc download project
-cd /path/to/ai-translator
+# 1. Clone hoặc tải về dự án
+cd /duong/dan/toi/ai-translator
 
-# 2. Install dependencies
+# 2. Cài đặt các dependencies
 npm install
 
 # 3. Build extension
 npm run build
 ```
 
-Sau đó trong Raycast:
+Sau đó trong Raycast, vào **Settings → Extensions → + → Import Extension** và chọn thư mục dự án.
 
-1. Mở Raycast → nhấn `Cmd + ,` để mở Settings
-2. Chọn tab **Extensions**
-3. Nhấn nút **+** (góc dưới trái) → chọn **Import Extension**
-4. Chọn thư mục `ai-translator`
-5. Extension sẽ được import và sử dụng vĩnh viễn
+### Xử lý lỗi `Could not find command's executable JS file`
 
-### Option 2: Development Mode
-
-Chạy extension ở chế độ development (cần mở terminal):
-
-```bash
-cd /path/to/ai-translator
-npm install
-npm run dev
-```
-
-> ⚠️ Extension chỉ hoạt động khi terminal đang chạy lệnh `npm run dev`
-
-## How It Works
-
-The extension uses AI to detect your input language and intelligently routes the translation:
-
-- **Primary Language → Secondary Language**: If you input Vietnamese, it translates to English
-- **Secondary Language → Primary Language**: If you input English, it translates to Vietnamese
-- **Other Languages → Primary Language**: Any other language translates to your primary language
-
-## Configuration
-
-1. Open Raycast → `Cmd + ,` → Extensions → AI Translator
-2. Configure the following:
-   - **API Key**: Your OpenAI API key (required)
-   - **API URL**: Base URL (default: `https://api.openai.com/v1/chat/completions`)
-   - **AI Model**: Model to use (default: `gpt-3.5-turbo`)
-   - **Primary Language**: Your main language (default: `Vietnamese`)
-   - **Secondary Language**: Your second language (default: `English`)
-
-## Usage Examples
-
-**Quick Translate (Recommended)**:
-
-1. Copy text to clipboard
-2. Open Raycast → "Quick Translate"
-3. Translation is automatically pasted to active app
-
-**Translate (Preview Mode)**:
-
-1. Copy text to clipboard
-2. Open Raycast → "Translate"
-3. Preview translation, press `Enter` to paste
-
-**Translate Selection**:
-
-1. Select text in any app
-2. Open Raycast → "Translate Selection"
-3. Translation replaces selected text
-
-## Translation Examples
-
-| Input                         | Output                        |
-| ----------------------------- | ----------------------------- |
-| Xin chào, bạn khỏe không? | Hello, how are you?           |
-| Hello, how are you?           | Xin chào, bạn khỏe không? |
-| Bonjour, comment allez-vous?  | Xin chào, bạn khỏe không? |
-
-## Development
-
-### Build & Lint
+Nếu bạn import extension từ file ZIP và gặp lỗi này, hãy chạy các lệnh sau trong thư mục dự án:
 
 ```bash
 npm install
-npm run build    # Build for distribution
-npm run lint     # Check code style
+npm run build
 ```
 
-### Publish to Raycast Store
+### Đóng Gói và Chia Sẻ Extension
 
-1. Update `package.json`:
+Để chia sẻ extension một cách riêng tư cho bạn bè, bạn có thể xuất bản nó lên Raycast Store dưới chế độ **Private**.
 
-   - Set `author` to your Raycast username
-   - Ensure `categories` is set (e.g., `["Productivity"]`)
-2. Add screenshots (recommended 3-6):
+```bash
+# Chạy lệnh publish
+npx @raycast/api@latest publish
+```
 
-   - Open Raycast Settings → Advanced → set hotkey for **Window Capture**
-   - Run `npm run dev`, open command, press hotkey with "Save to Metadata" ticked
-3. Publish:
+Trong quá trình xuất bản, hãy chọn chế độ `Private`. Sau khi hoàn tất, bạn sẽ nhận được một link cài đặt. Bất kỳ ai có link này đều có thể cài đặt extension của bạn một cách dễ dàng.
 
-   ```bash
-   npm run publish
-   ```
-
-See [Raycast Docs](https://developers.raycast.com/basics/publish-an-extension) for details.
-
-## Requirements
-
-- Raycast
-- OpenAI API key (or compatible service)
-
-## License
-
-MIT
