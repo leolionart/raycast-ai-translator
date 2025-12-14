@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   List,
   ActionPanel,
@@ -10,6 +10,7 @@ import {
   popToRoot,
   Icon,
   LaunchProps,
+  Color,
 } from "@raycast/api";
 import {
   getTranslatorConfig,
@@ -17,6 +18,11 @@ import {
   LANGUAGES,
   TARGET_LANGUAGE_OPTIONS,
 } from "./translator";
+import {
+  saveTranslation,
+  getHistory,
+  TranslationHistoryItem,
+} from "./history";
 
 interface TranslatePreviewArguments {
   text?: string;
@@ -40,6 +46,22 @@ export default function Command(
   const [selectedTargetLanguage, setSelectedTargetLanguage] = useState<string>(
     LANGUAGES.AUTO,
   );
+  const [history, setHistory] = useState<TranslationHistoryItem[]>([]);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Load history on mount
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  async function loadHistory() {
+    try {
+      const items = await getHistory();
+      setHistory(items);
+    } catch (error) {
+      console.error("Failed to load history:", error);
+    }
+  }
 
   // Auto-load clipboard or context and translate on mount
   useEffect(() => {
@@ -93,6 +115,17 @@ export default function Command(
       setDetectedLanguage(result.detectedLanguage);
       setTargetLanguage(result.targetLanguage);
       setTranslatedText(result.translatedText);
+
+      // Save to history
+      await saveTranslation(
+        textToTranslate.trim(),
+        result.translatedText,
+        result.detectedLanguage,
+        result.targetLanguage,
+      );
+
+      // Reload history
+      await loadHistory();
     } catch (error) {
       console.error("Translation error:", error);
       showToast({
@@ -136,6 +169,37 @@ export default function Command(
     await showHUD("✓ Copied to clipboard");
   }
 
+  async function handleHistoryPaste(item: TranslationHistoryItem) {
+    await Clipboard.paste(item.translatedText);
+    await showHUD("✓ Pasted from history");
+    await popToRoot();
+  }
+
+  async function handleHistoryCopy(item: TranslationHistoryItem) {
+    await Clipboard.copy(item.translatedText);
+    await showHUD("✓ Copied from history");
+  }
+
+  function handleSearchTextChange(text: string) {
+    setInputText(text);
+
+    // Clear previous timer
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // Clear translation result when text is cleared
+    if (!text.trim()) {
+      setTranslatedText("");
+      setDetectedLanguage("");
+      setTargetLanguage("");
+      return;
+    }
+
+    // Debounce translation - 1.5 seconds to allow typing
+    debounceTimer.current = setTimeout(() => handleTranslate(text), 1500);
+  }
+
   // Format markdown for detail view
   const detailMarkdown = translatedText
     ? `## Translation Result
@@ -158,20 +222,32 @@ ${translatedText}`
 ${inputText}`
       : `## Ready
 
-Waiting for clipboard content or enter text to search...`;
+Type text to translate or press Enter on a history item to use it.`;
+
+  // Format time for history
+  function formatTime(timestamp: number): string {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  }
+
+  // Show history when no input text
+  const showHistory = !inputText.trim() && !translatedText;
 
   return (
     <List
       isLoading={isLoading}
       searchBarPlaceholder="Enter text to translate..."
-      onSearchTextChange={(text) => {
-        setInputText(text);
-        if (text.trim()) {
-          // Debounce translation
-          const timer = setTimeout(() => handleTranslate(text), 500);
-          return () => clearTimeout(timer);
-        }
-      }}
+      onSearchTextChange={handleSearchTextChange}
       searchBarAccessory={
         <List.Dropdown
           tooltip="Target Language"
@@ -189,7 +265,7 @@ Waiting for clipboard content or enter text to search...`;
           </List.Dropdown.Section>
         </List.Dropdown>
       }
-      isShowingDetail={true}
+      isShowingDetail={!showHistory || history.length === 0}
     >
       {translatedText ? (
         <List.Item
@@ -237,7 +313,51 @@ Waiting for clipboard content or enter text to search...`;
           }
           icon={Icon.Clock}
           detail={<List.Item.Detail markdown={detailMarkdown} />}
+          actions={
+            <ActionPanel>
+              <Action
+                title="Translate Now"
+                icon={Icon.Globe}
+                onAction={() => handleTranslate()}
+              />
+            </ActionPanel>
+          }
         />
+      ) : history.length > 0 ? (
+        <List.Section title="Recent Translations">
+          {history.slice(0, 10).map((item) => (
+            <List.Item
+              key={item.id}
+              title={
+                item.translatedText.length > 50
+                  ? item.translatedText.substring(0, 50) + "..."
+                  : item.translatedText
+              }
+              subtitle={
+                item.originalText.length > 30
+                  ? item.originalText.substring(0, 30) + "..."
+                  : item.originalText
+              }
+              accessories={[{ text: formatTime(item.timestamp) }]}
+              icon={{ source: Icon.Clock, tintColor: Color.SecondaryText }}
+              actions={
+                <ActionPanel>
+                  <Action
+                    title="Paste Translation"
+                    icon={Icon.Clipboard}
+                    onAction={() => handleHistoryPaste(item)}
+                  />
+                  <Action
+                    title="Copy Translation"
+                    icon={Icon.CopyClipboard}
+                    shortcut={{ modifiers: ["cmd"], key: "c" }}
+                    onAction={() => handleHistoryCopy(item)}
+                  />
+                </ActionPanel>
+              }
+            />
+          ))}
+        </List.Section>
       ) : (
         <List.EmptyView
           title="AI Translator"

@@ -16,6 +16,7 @@ import {
   SOURCE_LANGUAGE_OPTIONS,
   TARGET_LANGUAGE_OPTIONS,
 } from "./translator";
+import { saveTranslation } from "./history";
 
 export default function Command() {
   const [inputText, setInputText] = useState("");
@@ -89,6 +90,14 @@ export default function Command() {
       setDetectedLanguage(result.detectedLanguage);
       setTargetLanguage(result.targetLanguage);
       setTranslatedText(result.translatedText);
+
+      // Save to history
+      await saveTranslation(
+        inputText.trim(),
+        result.translatedText,
+        result.detectedLanguage,
+        result.targetLanguage,
+      );
 
       showToast({
         style: Toast.Style.Success,

@@ -26,9 +26,9 @@
         },
         {
             "name": "quick-translate",
-      "title": "Quick Translate (Toast)",
-      "subtitle": "Clipboard → Toast",
-      "description": "Auto-translate clipboard and show result in toast.",
+            "title": "Quick Translate (Toast)",
+            "subtitle": "Clipboard → Toast",
+            "description": "Auto-translate clipboard and show result in toast.",
             "mode": "no-view"
         },
         {
@@ -36,6 +36,13 @@
             "title": "Translate Selection",
             "description": "Translate selected text and paste result.",
             "mode": "no-view"
+        },
+        {
+            "name": "translation-history",
+            "title": "Translation History",
+            "subtitle": "View Past Translations",
+            "description": "View and manage your translation history.",
+            "mode": "view"
         }
     ],
     "preferences": [

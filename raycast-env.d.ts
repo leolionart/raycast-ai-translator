@@ -32,6 +32,8 @@ declare namespace Preferences {
   export type QuickTranslate = ExtensionPreferences & {}
   /** Preferences accessible in the `translate-selection` command */
   export type TranslateSelection = ExtensionPreferences & {}
+  /** Preferences accessible in the `translation-history` command */
+  export type TranslationHistory = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
@@ -43,5 +45,7 @@ declare namespace Arguments {
   export type QuickTranslate = {}
   /** Arguments passed to the `translate-selection` command */
   export type TranslateSelection = {}
+  /** Arguments passed to the `translation-history` command */
+  export type TranslationHistory = {}
 }
 
