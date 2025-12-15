@@ -1,16 +1,26 @@
-import { Clipboard, showToast, Toast, popToRoot } from "@raycast/api";
+import { Clipboard, getSelectedText, showToast, Toast, popToRoot } from "@raycast/api";
 import { getTranslatorConfig, smartTranslate } from "./translator";
 
 export default async function Command() {
   try {
-    // Read text from clipboard
-    const clipboardText = await Clipboard.readText();
-
-    if (!clipboardText || clipboardText.trim() === "") {
+    // Get selected text from active editor
+    let selectedText: string;
+    try {
+      selectedText = await getSelectedText();
+    } catch {
       await showToast({
         style: Toast.Style.Failure,
-        title: "Clipboard Empty",
-        message: "Please copy some text first",
+        title: "No Selection",
+        message: "Please select some text first",
+      });
+      return;
+    }
+
+    if (!selectedText || selectedText.trim() === "") {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Empty Selection",
+        message: "Please select some text first",
       });
       return;
     }
@@ -32,17 +42,20 @@ export default async function Command() {
       style: Toast.Style.Animated,
       title: "Translating...",
       message:
-        clipboardText.substring(0, 50) +
-        (clipboardText.length > 50 ? "..." : ""),
+        selectedText.substring(0, 50) +
+        (selectedText.length > 50 ? "..." : ""),
     });
 
     // Smart translate
-    const result = await smartTranslate(clipboardText.trim(), config);
+    const result = await smartTranslate(selectedText.trim(), config);
 
-    // Show result in toast
+    // Paste translated text directly into active editor (replaces selection)
+    await Clipboard.paste(result.translatedText);
+
+    // Show result on toast
     await showToast({
       style: Toast.Style.Success,
-      title: "Translation Result",
+      title: "Translated ✓",
       message: result.translatedText,
     });
     await popToRoot();

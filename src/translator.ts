@@ -246,3 +246,96 @@ export async function smartTranslate(
     originalText: text,
   };
 }
+
+/**
+ * Content expansion result with bilingual output
+ */
+export interface ContentExpansionResult {
+  originalText: string;
+  vietnameseContent: string;
+  englishContent: string;
+}
+
+/**
+ * Expand bullet points/short notes into professional long-form content
+ * Returns both Vietnamese and English versions
+ */
+export async function expandContent(
+  bulletPoints: string,
+  config: TranslatorConfig,
+): Promise<ContentExpansionResult> {
+  const systemPrompt = `You are a professional content writer. Your task is to expand bullet points or short notes into well-structured, professional long-form content.
+
+RULES:
+1. Maintain the original meaning and key points
+2. Add proper transitions and flow between ideas
+3. Use professional but accessible language
+4. Keep paragraphs readable (3-5 sentences each)
+5. Output MUST be valid JSON with exactly this structure:
+{
+  "vietnamese": "full content in Vietnamese",
+  "english": "full content in English"
+}
+
+If the input is already in Vietnamese, write the Vietnamese version first naturally, then translate to English.
+If the input is already in English, write the English version first naturally, then translate to Vietnamese.
+For other languages, detect and handle appropriately.
+
+IMPORTANT: Return ONLY the JSON object, no markdown code blocks or other text.`;
+
+  const response = await fetch(config.apiURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: config.model,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Expand the following bullet points/notes into professional content:\n\n${bulletPoints}`,
+        },
+      ],
+      temperature: 0.7,
+    }),
+  });
+
+  const json = (await response.json()) as {
+    choices?: Array<{ message: { content: string } }>;
+  };
+
+  if (!json.choices || json.choices.length === 0) {
+    throw new Error("Failed to expand content: No response from AI");
+  }
+
+  const content = json.choices[0].message.content.trim();
+
+  // Parse JSON response, handling potential markdown code blocks
+  let parsed: { vietnamese: string; english: string };
+  try {
+    // Remove markdown code blocks if present
+    const cleanContent = content
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+    parsed = JSON.parse(cleanContent);
+  } catch {
+    throw new Error("Failed to parse AI response as JSON");
+  }
+
+  if (!parsed.vietnamese || !parsed.english) {
+    throw new Error("AI response missing required fields");
+  }
+
+  return {
+    originalText: bulletPoints,
+    vietnameseContent: parsed.vietnamese,
+    englishContent: parsed.english,
+  };
+}

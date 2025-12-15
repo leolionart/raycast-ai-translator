@@ -34,6 +34,8 @@ declare namespace Preferences {
   export type TranslateSelection = ExtensionPreferences & {}
   /** Preferences accessible in the `translation-history` command */
   export type TranslationHistory = ExtensionPreferences & {}
+  /** Preferences accessible in the `expand-content` command */
+  export type ExpandContent = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
@@ -47,5 +49,7 @@ declare namespace Arguments {
   export type TranslateSelection = {}
   /** Arguments passed to the `translation-history` command */
   export type TranslationHistory = {}
+  /** Arguments passed to the `expand-content` command */
+  export type ExpandContent = {}
 }
 

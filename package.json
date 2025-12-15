@@ -43,6 +43,13 @@
             "subtitle": "View Past Translations",
             "description": "View and manage your translation history.",
             "mode": "view"
+        },
+        {
+            "name": "expand-content",
+            "title": "Expand Content",
+            "subtitle": "Bullets → Professional",
+            "description": "Transform bullet points into professional content with bilingual paste options.",
+            "mode": "view"
         }
     ],
     "preferences": [
