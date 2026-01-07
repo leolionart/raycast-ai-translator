@@ -1,4 +1,10 @@
-import { Clipboard, getSelectedText, showToast, Toast, popToRoot } from "@raycast/api";
+import {
+  Clipboard,
+  getSelectedText,
+  showToast,
+  Toast,
+  popToRoot,
+} from "@raycast/api";
 import { getTranslatorConfig, smartTranslate } from "./translator";
 
 export default async function Command() {
@@ -42,8 +48,7 @@ export default async function Command() {
       style: Toast.Style.Animated,
       title: "Translating...",
       message:
-        selectedText.substring(0, 50) +
-        (selectedText.length > 50 ? "..." : ""),
+        selectedText.substring(0, 50) + (selectedText.length > 50 ? "..." : ""),
     });
 
     // Smart translate

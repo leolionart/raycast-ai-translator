@@ -18,11 +18,7 @@ import {
   LANGUAGES,
   TARGET_LANGUAGE_OPTIONS,
 } from "./translator";
-import {
-  saveTranslation,
-  getHistory,
-  TranslationHistoryItem,
-} from "./history";
+import { saveTranslation, getHistory, TranslationHistoryItem } from "./history";
 
 interface TranslatePreviewArguments {
   text?: string;

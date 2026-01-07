@@ -20,13 +20,13 @@
         },
         {
             "name": "index",
-            "title": "Translate (Form)",
+            "title": "Translate (form)",
             "description": "Manual translate with language selection form.",
             "mode": "view"
         },
         {
             "name": "quick-translate",
-            "title": "Quick Translate (Toast)",
+            "title": "Quick Translate (toast)",
             "subtitle": "Clipboard → Toast",
             "description": "Auto-translate clipboard and show result in toast.",
             "mode": "no-view"
