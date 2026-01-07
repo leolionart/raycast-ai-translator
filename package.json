@@ -6,6 +6,7 @@
     "description": "Translate text using AI with automatic language detection and smart routing.",
     "icon": "icon.png",
     "author": "leolionart",
+    "owner": "naai-studio",
     "license": "MIT",
     "categories": [
         "Productivity"
